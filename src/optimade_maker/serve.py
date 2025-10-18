@@ -152,6 +152,7 @@ class OptimakeServer:
         host: str = "127.0.0.1",
         port: int = 5000,
         extra_config_file: Path | None = None,
+        **config_kws,
     ):
         """Initialise the OptimakeServer instance.
 
@@ -183,6 +184,19 @@ class OptimakeServer:
 
         self.provider_prefix = None
         self.optimade_config = self.get_optimade_config()
+
+        if config_kws:
+            self.optimade_config.update(config_kws)
+
+        self.provider_prefix = self.optimade_config.get("provider", {}).get("prefix")
+
+        # replace the provider prefix in the provider fields
+        provider_fields = get_provider_fields_from_jsonl(
+            self.jsonl_path, replace_prefix=self.provider_prefix
+        )
+
+        self.optimade_config["provider_fields"] = provider_fields
+
         set_config_env_variables(self.optimade_config)
 
     def get_optimade_config(self):
@@ -210,15 +224,6 @@ class OptimakeServer:
             with open(self.extra_config_file, "r") as f:
                 extra_config = json.load(f)
             config_dict.update(extra_config)
-
-        self.provider_prefix = config_dict.get("provider", {}).get("prefix")
-
-        # replace the provider prefix in the provider fields
-        provider_fields = get_provider_fields_from_jsonl(
-            self.jsonl_path, replace_prefix=self.provider_prefix
-        )
-
-        config_dict["provider_fields"] = provider_fields
 
         LOGGER.debug(f"CONFIG: {json.dumps(config_dict, indent=2)}")
 
