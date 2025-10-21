@@ -198,6 +198,7 @@ class OptimakeServer:
         self.optimade_config["provider_fields"] = provider_fields
 
         set_config_env_variables(self.optimade_config)
+        LOGGER.debug(f"CONFIG: {json.dumps(self.optimade_config, indent=2)}")
 
     def get_optimade_config(self):
         # Default configuration options
@@ -224,8 +225,6 @@ class OptimakeServer:
             with open(self.extra_config_file, "r") as f:
                 extra_config = json.load(f)
             config_dict.update(extra_config)
-
-        LOGGER.debug(f"CONFIG: {json.dumps(config_dict, indent=2)}")
 
         return config_dict
 
