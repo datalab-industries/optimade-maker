@@ -186,6 +186,7 @@ class OptimakeServer:
         self.optimade_config = self.get_optimade_config()
 
         if config_kws:
+            LOGGER.debug(f"config_kw_overrides: {config_kws}")
             self.optimade_config.update(config_kws)
 
         self.provider_prefix = self.optimade_config.get("provider", {}).get("prefix")
